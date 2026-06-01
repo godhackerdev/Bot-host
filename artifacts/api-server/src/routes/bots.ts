@@ -29,15 +29,17 @@ import {
   sendInput,
 } from "../lib/process-manager";
 
+import { requireApproved } from "../middlewares/requireAuth";
+
 const router: IRouter = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 100 * 1024 * 1024 } });
 
-router.get("/bots", async (req, res): Promise<void> => {
+router.get("/bots", requireApproved, async (req, res): Promise<void> => {
   const bots = await db.select().from(botsTable).orderBy(botsTable.createdAt);
   res.json(ListBotsResponse.parse(bots));
 });
 
-router.post("/bots", async (req, res): Promise<void> => {
+router.post("/bots", requireApproved, async (req, res): Promise<void> => {
   const parsed = CreateBotBody.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
@@ -47,7 +49,7 @@ router.post("/bots", async (req, res): Promise<void> => {
   res.status(201).json(GetBotResponse.parse(bot));
 });
 
-router.get("/bots/:id", async (req, res): Promise<void> => {
+router.get("/bots/:id", requireApproved, async (req, res): Promise<void> => {
   const params = GetBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -61,7 +63,7 @@ router.get("/bots/:id", async (req, res): Promise<void> => {
   res.json(GetBotResponse.parse(bot));
 });
 
-router.patch("/bots/:id", async (req, res): Promise<void> => {
+router.patch("/bots/:id", requireApproved, async (req, res): Promise<void> => {
   const params = UpdateBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -80,7 +82,7 @@ router.patch("/bots/:id", async (req, res): Promise<void> => {
   res.json(GetBotResponse.parse(bot));
 });
 
-router.delete("/bots/:id", async (req, res): Promise<void> => {
+router.delete("/bots/:id", requireApproved, async (req, res): Promise<void> => {
   const params = DeleteBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -95,7 +97,7 @@ router.delete("/bots/:id", async (req, res): Promise<void> => {
   res.sendStatus(204);
 });
 
-router.post("/bots/:id/upload", upload.single("file"), async (req, res): Promise<void> => {
+router.post("/bots/:id/upload", requireApproved, upload.single("file"), async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);
   if (isNaN(id)) {
@@ -121,7 +123,7 @@ router.post("/bots/:id/upload", upload.single("file"), async (req, res): Promise
   }
 });
 
-router.post("/bots/:id/start", async (req, res): Promise<void> => {
+router.post("/bots/:id/start", requireApproved, async (req, res): Promise<void> => {
   const params = StartBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -142,7 +144,7 @@ router.post("/bots/:id/start", async (req, res): Promise<void> => {
   res.json(GetBotResponse.parse(updated));
 });
 
-router.post("/bots/:id/stop", async (req, res): Promise<void> => {
+router.post("/bots/:id/stop", requireApproved, async (req, res): Promise<void> => {
   const params = StopBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -157,7 +159,7 @@ router.post("/bots/:id/stop", async (req, res): Promise<void> => {
   res.json(GetBotResponse.parse(bot));
 });
 
-router.post("/bots/:id/restart", async (req, res): Promise<void> => {
+router.post("/bots/:id/restart", requireApproved, async (req, res): Promise<void> => {
   const params = RestartBotParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -179,7 +181,7 @@ router.post("/bots/:id/restart", async (req, res): Promise<void> => {
   res.json(GetBotResponse.parse(updated));
 });
 
-router.get("/bots/:id/logs", async (req, res): Promise<void> => {
+router.get("/bots/:id/logs", requireApproved, async (req, res): Promise<void> => {
   const params = GetBotLogsParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -194,7 +196,7 @@ router.get("/bots/:id/logs", async (req, res): Promise<void> => {
   res.json(GetBotLogsResponse.parse(logs));
 });
 
-router.post("/bots/:id/logs", async (req, res): Promise<void> => {
+router.post("/bots/:id/logs", requireApproved, async (req, res): Promise<void> => {
   const params = AddBotLogParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -209,7 +211,7 @@ router.post("/bots/:id/logs", async (req, res): Promise<void> => {
   res.status(201).json(log);
 });
 
-router.post("/bots/:id/input", async (req, res): Promise<void> => {
+router.post("/bots/:id/input", requireApproved, async (req, res): Promise<void> => {
   const params = SendBotInputParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
@@ -228,7 +230,7 @@ router.post("/bots/:id/input", async (req, res): Promise<void> => {
   res.json({ ok: true });
 });
 
-router.get("/dashboard/stats", async (_req, res): Promise<void> => {
+router.get("/dashboard/stats", requireApproved, async (_req, res): Promise<void> => {
   const bots = await db.select().from(botsTable);
   const total = bots.length;
   const running = bots.filter((b) => b.status === "running").length;

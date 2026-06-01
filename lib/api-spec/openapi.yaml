@@ -9,13 +9,11 @@ servers:
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: auth
   - name: bots
-    description: Bot management
   - name: logs
-    description: Bot logs
+  - name: admin
   - name: dashboard
-    description: Dashboard stats
 
 paths:
   /healthz:
@@ -31,11 +29,71 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Not authenticated
+
+  /admin/users:
+    get:
+      operationId: listUsers
+      tags: [admin]
+      summary: List all users (admin only)
+      responses:
+        "200":
+          description: All users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+        "403":
+          description: Forbidden
+
+  /admin/users/{id}:
+    patch:
+      operationId: updateUserApproval
+      tags: [admin]
+      summary: Approve or reject a user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserApprovalUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+
   /bots:
     get:
       operationId: listBots
       tags: [bots]
-      summary: List all bots
       responses:
         "200":
           description: List of bots
@@ -48,7 +106,6 @@ paths:
     post:
       operationId: createBot
       tags: [bots]
-      summary: Create a new bot
       requestBody:
         required: true
         content:
@@ -69,7 +126,6 @@ paths:
     get:
       operationId: getBot
       tags: [bots]
-      summary: Get a bot by ID
       parameters:
         - name: id
           in: path
@@ -88,7 +144,6 @@ paths:
     patch:
       operationId: updateBot
       tags: [bots]
-      summary: Update a bot
       parameters:
         - name: id
           in: path
@@ -113,7 +168,6 @@ paths:
     delete:
       operationId: deleteBot
       tags: [bots]
-      summary: Delete a bot
       parameters:
         - name: id
           in: path
@@ -130,7 +184,6 @@ paths:
     post:
       operationId: startBot
       tags: [bots]
-      summary: Start a bot
       parameters:
         - name: id
           in: path
@@ -151,7 +204,6 @@ paths:
     post:
       operationId: stopBot
       tags: [bots]
-      summary: Stop a bot
       parameters:
         - name: id
           in: path
@@ -172,7 +224,6 @@ paths:
     post:
       operationId: restartBot
       tags: [bots]
-      summary: Restart a bot
       parameters:
         - name: id
           in: path
@@ -193,7 +244,6 @@ paths:
     get:
       operationId: getBotLogs
       tags: [logs]
-      summary: Get logs for a bot
       parameters:
         - name: id
           in: path
@@ -202,7 +252,7 @@ paths:
             type: integer
       responses:
         "200":
-          description: List of log entries
+          description: Log entries
           content:
             application/json:
               schema:
@@ -214,7 +264,6 @@ paths:
     post:
       operationId: addBotLog
       tags: [logs]
-      summary: Add a log entry to a bot
       parameters:
         - name: id
           in: path
@@ -239,7 +288,6 @@ paths:
     post:
       operationId: sendBotInput
       tags: [bots]
-      summary: Send stdin input to a running bot process
       parameters:
         - name: id
           in: path
@@ -260,13 +308,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/CommandResult"
         "404":
-          description: Bot not found or not running
+          description: Not found
 
   /dashboard/stats:
     get:
       operationId: getDashboardStats
       tags: [dashboard]
-      summary: Get dashboard statistics
       responses:
         "200":
           description: Dashboard stats
@@ -279,11 +326,47 @@ components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
         status:
           type: string
-      required:
-        - status
+
+    UserProfile:
+      type: object
+      required: [id, email, role, approvalStatus, createdAt]
+      properties:
+        id:
+          type: integer
+        clerkId:
+          type: string
+        email:
+          type: string
+        name:
+          type: ["string", "null"]
+        picture:
+          type: ["string", "null"]
+        role:
+          type: string
+          enum: [admin, user]
+        approvalStatus:
+          type: string
+          enum: [pending, approved, rejected]
+        approvedUntil:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    UserApprovalUpdate:
+      type: object
+      required: [approvalStatus]
+      properties:
+        approvalStatus:
+          type: string
+          enum: [pending, approved, rejected]
+        durationDays:
+          type: ["integer", "null"]
 
     Bot:
       type: object

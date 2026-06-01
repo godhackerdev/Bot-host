@@ -19,3 +19,8 @@ export * from './commandResult';
 export * from './dashboardStats';
 export * from './healthStatus';
 export * from './processInput';
+export * from './userApprovalUpdate';
+export * from './userApprovalUpdateApprovalStatus';
+export * from './userProfile';
+export * from './userProfileApprovalStatus';
+export * from './userProfileRole';

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <rect width="200" height="48" rx="4" fill="none"/>
+  <rect x="4" y="12" width="24" height="24" rx="3" fill="hsl(32,100%,50%)"/>
+  <text x="16" y="28" font-family="monospace" font-size="14" font-weight="800" fill="hsl(228,10%,6%)" text-anchor="middle">B</text>
+  <text x="36" y="31" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700" fill="hsl(32,100%,75%)">BOT_HOST</text>
+</svg>

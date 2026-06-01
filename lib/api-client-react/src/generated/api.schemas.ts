@@ -9,6 +9,53 @@ export interface HealthStatus {
   status: string;
 }
 
+export type UserProfileRole = typeof UserProfileRole[keyof typeof UserProfileRole];
+
+
+export const UserProfileRole = {
+  admin: 'admin',
+  user: 'user',
+} as const;
+
+export type UserProfileApprovalStatus = typeof UserProfileApprovalStatus[keyof typeof UserProfileApprovalStatus];
+
+
+export const UserProfileApprovalStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface UserProfile {
+  id: number;
+  clerkId?: string;
+  email: string;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  picture?: string | null;
+  role: UserProfileRole;
+  approvalStatus: UserProfileApprovalStatus;
+  /** @nullable */
+  approvedUntil?: string | null;
+  createdAt: string;
+}
+
+export type UserApprovalUpdateApprovalStatus = typeof UserApprovalUpdateApprovalStatus[keyof typeof UserApprovalUpdateApprovalStatus];
+
+
+export const UserApprovalUpdateApprovalStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+} as const;
+
+export interface UserApprovalUpdate {
+  approvalStatus: UserApprovalUpdateApprovalStatus;
+  /** @nullable */
+  durationDays?: number | null;
+}
+
 export type BotStatus = typeof BotStatus[keyof typeof BotStatus];
 
 

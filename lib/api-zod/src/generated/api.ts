@@ -17,8 +17,63 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * @summary List all bots
+ * @summary Get current user
  */
+export const GetMeResponse = zod.object({
+  "id": zod.number(),
+  "clerkId": zod.string().optional(),
+  "email": zod.string(),
+  "name": zod.string().nullish(),
+  "picture": zod.string().nullish(),
+  "role": zod.enum(['admin', 'user']),
+  "approvalStatus": zod.enum(['pending', 'approved', 'rejected']),
+  "approvedUntil": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary List all users (admin only)
+ */
+export const ListUsersResponseItem = zod.object({
+  "id": zod.number(),
+  "clerkId": zod.string().optional(),
+  "email": zod.string(),
+  "name": zod.string().nullish(),
+  "picture": zod.string().nullish(),
+  "role": zod.enum(['admin', 'user']),
+  "approvalStatus": zod.enum(['pending', 'approved', 'rejected']),
+  "approvedUntil": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+export const ListUsersResponse = zod.array(ListUsersResponseItem)
+
+
+/**
+ * @summary Approve or reject a user
+ */
+export const UpdateUserApprovalParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateUserApprovalBody = zod.object({
+  "approvalStatus": zod.enum(['pending', 'approved', 'rejected']),
+  "durationDays": zod.number().nullish()
+})
+
+export const UpdateUserApprovalResponse = zod.object({
+  "id": zod.number(),
+  "clerkId": zod.string().optional(),
+  "email": zod.string(),
+  "name": zod.string().nullish(),
+  "picture": zod.string().nullish(),
+  "role": zod.enum(['admin', 'user']),
+  "approvalStatus": zod.enum(['pending', 'approved', 'rejected']),
+  "approvedUntil": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
 export const ListBotsResponseItem = zod.object({
   "id": zod.number(),
   "name": zod.string(),
@@ -35,9 +90,6 @@ export const ListBotsResponseItem = zod.object({
 export const ListBotsResponse = zod.array(ListBotsResponseItem)
 
 
-/**
- * @summary Create a new bot
- */
 
 
 
@@ -50,9 +102,6 @@ export const CreateBotBody = zod.object({
 })
 
 
-/**
- * @summary Get a bot by ID
- */
 export const GetBotParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -72,9 +121,6 @@ export const GetBotResponse = zod.object({
 })
 
 
-/**
- * @summary Update a bot
- */
 export const UpdateBotParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -105,17 +151,11 @@ export const UpdateBotResponse = zod.object({
 })
 
 
-/**
- * @summary Delete a bot
- */
 export const DeleteBotParams = zod.object({
   "id": zod.coerce.number()
 })
 
 
-/**
- * @summary Start a bot
- */
 export const StartBotParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -135,9 +175,6 @@ export const StartBotResponse = zod.object({
 })
 
 
-/**
- * @summary Stop a bot
- */
 export const StopBotParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -157,9 +194,6 @@ export const StopBotResponse = zod.object({
 })
 
 
-/**
- * @summary Restart a bot
- */
 export const RestartBotParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -179,9 +213,6 @@ export const RestartBotResponse = zod.object({
 })
 
 
-/**
- * @summary Get logs for a bot
- */
 export const GetBotLogsParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -196,9 +227,6 @@ export const GetBotLogsResponseItem = zod.object({
 export const GetBotLogsResponse = zod.array(GetBotLogsResponseItem)
 
 
-/**
- * @summary Add a log entry to a bot
- */
 export const AddBotLogParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -209,9 +237,6 @@ export const AddBotLogBody = zod.object({
 })
 
 
-/**
- * @summary Send stdin input to a running bot process
- */
 export const SendBotInputParams = zod.object({
   "id": zod.coerce.number()
 })
@@ -225,9 +250,6 @@ export const SendBotInputResponse = zod.object({
 })
 
 
-/**
- * @summary Get dashboard statistics
- */
 export const GetDashboardStatsResponse = zod.object({
   "total": zod.number(),
   "running": zod.number(),
