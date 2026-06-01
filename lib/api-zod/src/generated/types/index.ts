@@ -8,11 +8,14 @@
 
 export * from './bot';
 export * from './botInput';
+export * from './botInstallStatus';
 export * from './botLog';
 export * from './botLogInput';
 export * from './botLogInputLevel';
 export * from './botLogLevel';
 export * from './botPatch';
 export * from './botStatus';
+export * from './commandResult';
 export * from './dashboardStats';
 export * from './healthStatus';
+export * from './processInput';

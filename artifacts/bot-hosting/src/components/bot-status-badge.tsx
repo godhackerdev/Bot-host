@@ -1,6 +1,5 @@
-import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { BotStatus } from "@workspace/api-client-react/src/generated/api.schemas";
+import { BotStatus } from "@workspace/api-client-react";
 
 export function BotStatusBadge({ status }: { status: BotStatus }) {
   const getStatusColor = (s: BotStatus) => {
@@ -20,8 +19,8 @@ export function BotStatusBadge({ status }: { status: BotStatus }) {
   };
 
   return (
-    <Badge variant="outline" className={`font-mono uppercase ${getStatusColor(status)}`}>
-      {status === "running" && <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />}
+    <Badge variant="outline" className={`font-mono uppercase text-xs ${getStatusColor(status)}`}>
+      {status === "running" && <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse inline-block" />}
       {status}
     </Badge>
   );

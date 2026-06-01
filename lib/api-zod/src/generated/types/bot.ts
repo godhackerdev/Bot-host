@@ -5,6 +5,7 @@
  * WhatsApp Bot Hosting Platform API
  * OpenAPI spec version: 0.1.0
  */
+import type { BotInstallStatus } from './botInstallStatus';
 import type { BotStatus } from './botStatus';
 
 export interface Bot {
@@ -13,6 +14,7 @@ export interface Bot {
   /** @nullable */
   description?: string | null;
   status: BotStatus;
+  installStatus: BotInstallStatus;
   /** @nullable */
   phoneNumber?: string | null;
   /** @nullable */

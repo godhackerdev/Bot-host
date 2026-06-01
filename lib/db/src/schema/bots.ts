@@ -7,6 +7,8 @@ export const botsTable = pgTable("bots", {
   name: text("name").notNull(),
   description: text("description"),
   status: text("status").notNull().default("stopped"),
+  installStatus: text("install_status").notNull().default("none"),
+  directory: text("directory"),
   phoneNumber: text("phone_number"),
   webhookUrl: text("webhook_url"),
   token: text("token"),

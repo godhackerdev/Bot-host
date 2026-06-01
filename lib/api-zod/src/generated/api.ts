@@ -24,6 +24,7 @@ export const ListBotsResponseItem = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -61,6 +62,7 @@ export const GetBotResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -93,6 +95,7 @@ export const UpdateBotResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -122,6 +125,7 @@ export const StartBotResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -143,6 +147,7 @@ export const StopBotResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -164,6 +169,7 @@ export const RestartBotResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "status": zod.enum(['running', 'stopped', 'error', 'starting', 'stopping']),
+  "installStatus": zod.enum(['none', 'installing', 'ready', 'failed']),
   "phoneNumber": zod.string().nullish(),
   "webhookUrl": zod.string().nullish(),
   "token": zod.string().nullish(),
@@ -200,6 +206,22 @@ export const AddBotLogParams = zod.object({
 export const AddBotLogBody = zod.object({
   "level": zod.enum(['info', 'warn', 'error', 'debug']),
   "message": zod.string()
+})
+
+
+/**
+ * @summary Send stdin input to a running bot process
+ */
+export const SendBotInputParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SendBotInputBody = zod.object({
+  "text": zod.string()
+})
+
+export const SendBotInputResponse = zod.object({
+  "ok": zod.boolean()
 })
 
 

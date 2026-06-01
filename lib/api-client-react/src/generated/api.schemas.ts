@@ -20,12 +20,23 @@ export const BotStatus = {
   stopping: 'stopping',
 } as const;
 
+export type BotInstallStatus = typeof BotInstallStatus[keyof typeof BotInstallStatus];
+
+
+export const BotInstallStatus = {
+  none: 'none',
+  installing: 'installing',
+  ready: 'ready',
+  failed: 'failed',
+} as const;
+
 export interface Bot {
   id: number;
   name: string;
   /** @nullable */
   description?: string | null;
   status: BotStatus;
+  installStatus: BotInstallStatus;
   /** @nullable */
   phoneNumber?: string | null;
   /** @nullable */
@@ -87,6 +98,14 @@ export const BotLogInputLevel = {
 export interface BotLogInput {
   level: BotLogInputLevel;
   message: string;
+}
+
+export interface ProcessInput {
+  text: string;
+}
+
+export interface CommandResult {
+  ok: boolean;
 }
 
 export interface DashboardStats {

@@ -235,6 +235,33 @@ paths:
               schema:
                 $ref: "#/components/schemas/BotLog"
 
+  /bots/{id}/input:
+    post:
+      operationId: sendBotInput
+      tags: [bots]
+      summary: Send stdin input to a running bot process
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessInput"
+      responses:
+        "200":
+          description: Input sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommandResult"
+        "404":
+          description: Bot not found or not running
+
   /dashboard/stats:
     get:
       operationId: getDashboardStats
@@ -260,7 +287,7 @@ components:
 
     Bot:
       type: object
-      required: [id, name, status, createdAt, updatedAt]
+      required: [id, name, status, installStatus, createdAt, updatedAt]
       properties:
         id:
           type: integer
@@ -271,6 +298,9 @@ components:
         status:
           type: string
           enum: [running, stopped, error, starting, stopping]
+        installStatus:
+          type: string
+          enum: [none, installing, ready, failed]
         phoneNumber:
           type: ["string", "null"]
         webhookUrl:
@@ -343,6 +373,20 @@ components:
           enum: [info, warn, error, debug]
         message:
           type: string
+
+    ProcessInput:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+
+    CommandResult:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
 
     DashboardStats:
       type: object

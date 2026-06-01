@@ -25,8 +25,10 @@ import type {
   BotLog,
   BotLogInput,
   BotPatch,
+  CommandResult,
   DashboardStats,
-  HealthStatus
+  HealthStatus,
+  ProcessInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -842,6 +844,78 @@ export const useAddBotLog = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getAddBotLogMutationOptions(options));
+    }
+
+export const getSendBotInputUrl = (id: number,) => {
+
+
+
+
+  return `/api/bots/${id}/input`
+}
+
+/**
+ * @summary Send stdin input to a running bot process
+ */
+export const sendBotInput = async (id: number,
+    processInput: ProcessInput, options?: RequestInit): Promise<CommandResult> => {
+
+  return customFetch<CommandResult>(getSendBotInputUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      processInput,)
+  }
+);}
+
+
+
+
+export const getSendBotInputMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendBotInput>>, TError,{id: number;data: BodyType<ProcessInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendBotInput>>, TError,{id: number;data: BodyType<ProcessInput>}, TContext> => {
+
+const mutationKey = ['sendBotInput'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendBotInput>>, {id: number;data: BodyType<ProcessInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  sendBotInput(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendBotInputMutationResult = NonNullable<Awaited<ReturnType<typeof sendBotInput>>>
+    export type SendBotInputMutationBody = BodyType<ProcessInput>
+    export type SendBotInputMutationError = ErrorType<void>
+
+    /**
+ * @summary Send stdin input to a running bot process
+ */
+export const useSendBotInput = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendBotInput>>, TError,{id: number;data: BodyType<ProcessInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendBotInput>>,
+        TError,
+        {id: number;data: BodyType<ProcessInput>},
+        TContext
+      > => {
+      return useMutation(getSendBotInputMutationOptions(options));
     }
 
 export const getGetDashboardStatsUrl = () => {
