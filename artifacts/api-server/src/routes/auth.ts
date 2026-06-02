@@ -17,24 +17,27 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
   let [user] = await db.select().from(usersTable).where(eq(usersTable.clerkId, auth.userId));
 
   if (!user) {
-    let clerkUser: { emailAddresses?: { emailAddress: string }[]; fullName?: string; imageUrl?: string } | null = null;
+    let clerkEmail = "";
+    let clerkName: string | null = null;
+    let clerkPicture: string | null = null;
     try {
-      const clerk = await clerkClient();
-      clerkUser = await clerk.users.getUser(auth.userId);
+      const clerkUser = await clerkClient.users.getUser(auth.userId);
+      clerkEmail = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
+      clerkName = clerkUser.fullName ?? null;
+      clerkPicture = clerkUser.imageUrl ?? null;
     } catch {
-      clerkUser = null;
+      // continue with empty values
     }
 
-    const email = clerkUser?.emailAddresses?.[0]?.emailAddress ?? "";
-    const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const isAdmin = clerkEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
 
     const [created] = await db
       .insert(usersTable)
       .values({
         clerkId: auth.userId,
-        email,
-        name: clerkUser?.fullName ?? null,
-        picture: clerkUser?.imageUrl ?? null,
+        email: clerkEmail,
+        name: clerkName,
+        picture: clerkPicture,
         role: isAdmin ? "admin" : "user",
         approvalStatus: isAdmin ? "approved" : "pending",
         approvedUntil: isAdmin ? null : null,
@@ -42,8 +45,8 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
       .onConflictDoUpdate({
         target: usersTable.clerkId,
         set: {
-          name: clerkUser?.fullName ?? null,
-          picture: clerkUser?.imageUrl ?? null,
+          name: clerkName,
+          picture: clerkPicture,
           updatedAt: new Date(),
         },
       })
