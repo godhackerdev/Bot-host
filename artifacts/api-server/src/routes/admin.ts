@@ -5,15 +5,23 @@ import { requireAdmin } from "../middlewares/requireAuth";
 import {
   UpdateUserApprovalParams,
   UpdateUserApprovalBody,
-  ListUsersResponse,
-  UpdateUserApprovalResponse,
 } from "@workspace/api-zod";
+import type { User } from "@workspace/db";
 
 const router: IRouter = Router();
 
+function serializeUser(user: User) {
+  return {
+    ...user,
+    approvedUntil: user.approvedUntil?.toISOString() ?? null,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt?.toISOString() ?? null,
+  };
+}
+
 router.get("/admin/users", requireAdmin, async (_req, res): Promise<void> => {
   const users = await db.select().from(usersTable).orderBy(usersTable.createdAt);
-  res.json(ListUsersResponse.parse(users));
+  res.json(users.map(serializeUser));
 });
 
 router.patch("/admin/users/:id", requireAdmin, async (req, res): Promise<void> => {
@@ -41,7 +49,7 @@ router.patch("/admin/users/:id", requireAdmin, async (req, res): Promise<void> =
     .update(usersTable)
     .set({
       approvalStatus,
-      approvedUntil: approvedUntil,
+      approvedUntil,
       updatedAt: new Date(),
     })
     .where(eq(usersTable.id, params.data.id))
@@ -52,7 +60,7 @@ router.patch("/admin/users/:id", requireAdmin, async (req, res): Promise<void> =
     return;
   }
 
-  res.json(UpdateUserApprovalResponse.parse(user));
+  res.json(serializeUser(user));
 });
 
 export default router;

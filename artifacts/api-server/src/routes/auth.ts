@@ -4,8 +4,18 @@ import { eq } from "drizzle-orm";
 import { db, usersTable } from "@workspace/db";
 import { requireAuth, ADMIN_EMAIL } from "../middlewares/requireAuth";
 import { GetMeResponse } from "@workspace/api-zod";
+import type { User } from "@workspace/db";
 
 const router: IRouter = Router();
+
+function serializeUser(user: User) {
+  return {
+    ...user,
+    approvedUntil: user.approvedUntil?.toISOString() ?? null,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt?.toISOString() ?? null,
+  };
+}
 
 router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
   const auth = getAuth(req);
@@ -25,8 +35,8 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
       clerkEmail = clerkUser.emailAddresses?.[0]?.emailAddress ?? "";
       clerkName = clerkUser.fullName ?? null;
       clerkPicture = clerkUser.imageUrl ?? null;
-    } catch {
-      // continue with empty values
+    } catch (err) {
+      req.log.error({ err }, "Failed to fetch Clerk user profile");
     }
 
     const isAdmin = clerkEmail.toLowerCase() === ADMIN_EMAIL.toLowerCase();
@@ -40,7 +50,7 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
         picture: clerkPicture,
         role: isAdmin ? "admin" : "user",
         approvalStatus: isAdmin ? "approved" : "pending",
-        approvedUntil: isAdmin ? null : null,
+        approvedUntil: null,
       })
       .onConflictDoUpdate({
         target: usersTable.clerkId,
@@ -54,7 +64,7 @@ router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
     user = created;
   }
 
-  res.json(GetMeResponse.parse(user));
+  res.json(GetMeResponse.parse(serializeUser(user)));
 });
 
 export default router;
